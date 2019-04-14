@@ -3,7 +3,7 @@ import time
 
 pycom.heartbeat(True)
 
-'''
+
 while True:
     pycom.rgbled(0xFF0000)  # Red
     time.sleep(1)
