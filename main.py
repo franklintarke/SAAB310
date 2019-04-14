@@ -18,7 +18,7 @@ s = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
 while True:
     # send some data
     s.setblocking(True)
-    s.send('Hello')
+    s.send('Emma')
 
     # get any data received...
     s.setblocking(False)
