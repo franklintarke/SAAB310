@@ -11,10 +11,3 @@ while True:
     time.sleep(1)
     pycom.rgbled(0x0000FF)  # Blue
     time.sleep(1)
-
-'''
-#testing
-hell
-bullshit
-yee
-yolo
