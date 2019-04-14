@@ -11,7 +11,7 @@ from loramesh import Loramesh
 pycom.wifi_on_boot(False)
 pycom.heartbeat(False)
 
-lora = LoRa(mode=LoRa.LORA, region=LoRa.EU868, bandwidth=LoRa.BW_125KHZ, sf=7)
+lora = LoRa(mode=LoRa.LORA, region=LoRa.US915, bandwidth=LoRa.BW_125KHZ, sf=7)
 MAC = str(ubinascii.hexlify(lora.mac()))[2:-1]
 print("LoRa MAC: %s"%MAC)
 
