@@ -14,4 +14,5 @@ s.setblocking(False)
 while True:
     if s.recv(64) == b'Ping':
         s.send('Pong')
+        print('received')
     time.sleep(5)
