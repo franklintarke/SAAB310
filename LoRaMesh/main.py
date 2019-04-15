@@ -91,5 +91,4 @@ while True:
         time.sleep(20 + machine.rng()%20)
 
     # random sleep time
-    time.sleep(30 + machine.rng()%30)
-    
+    time.sleep(5)
