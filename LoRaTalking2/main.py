@@ -7,7 +7,7 @@ import time
 # Australia = LoRa.AU915
 # Europe = LoRa.EU868
 # United States = LoRa.US915
-lora = LoRa(mode=LoRa.LORA, region=LoRa.EU868)
+lora = LoRa(mode=LoRa.LORA, region=LoRa.US915)
 s = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
 s.setblocking(False)
 while True:
