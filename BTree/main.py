@@ -8,6 +8,17 @@ import machine
 
 from loramesh import Loramesh
 
+#Initialize Database
+import btree
+
+try:
+    f = open("mydb", "r+b")
+except OSError:
+    f = open("mydb", "w+b")
+
+
+
+
 pycom.wifi_on_boot(False)
 pycom.heartbeat(False)
 
@@ -19,6 +30,37 @@ mesh = Loramesh(lora)
 
 # waiting until it connected to Mesh network
 while True:
+
+    db = btree.open(f)
+    db[b"3"] = b"three"
+    db[b"1"] = b"one"
+    db[b"2"] = b"two"
+
+    db.flush()
+
+    print(db[b"2"])
+
+    for word in db.values(b"2"):
+        print(word)
+
+    del db[b"2"]
+
+    print(b"2" in db)
+
+    for key in db:
+        print(key)
+
+    db.close()
+
+    f.close()
+
+
+
+
+
+
+
+
     mesh.led_state()
     print("%d: State %s, single %s"%(time.time(), mesh.cli('state'), mesh.cli('singleton')))
     time.sleep(2)
