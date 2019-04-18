@@ -121,6 +121,8 @@ class Loramesh:
                 nei_list.append(nei_ip)
         return nei_list
 
+        nei_list
+
     def ipaddr(self):
         """ Returns a list with all unicast IPv6 """
         return self.mesh.ipaddr()

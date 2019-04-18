@@ -80,6 +80,11 @@ while True:
         else:
             print('Ping not received from neighbor %s'%neighbor)
 
+        #Ping Everyone
+        mesh.ping(ff03::1)
+
+
+
         time.sleep(10)
 
         pack_num = pack_num + 1
