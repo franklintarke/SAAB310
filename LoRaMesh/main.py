@@ -81,7 +81,11 @@ while True:
             print('Ping not received from neighbor %s'%neighbor)
 
         #Ping Everyone
-        mesh.ping(ff03::1)
+        if mesh.ping(ff03::1) > 0:
+            print('Ping received from neighbors')
+
+        else:
+            print('No Pings from neighbors')
 
 
 
