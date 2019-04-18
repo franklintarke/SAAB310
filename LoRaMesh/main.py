@@ -81,7 +81,7 @@ while True:
             print('Ping not received from neighbor %s'%neighbor)
 
         #Ping Everyone
-        if mesh.ping(ff03::1) > 0:
+        if mesh.ping('ff03::1') > 0:
             print('Ping received from neighbors')
 
         else:
@@ -89,15 +89,15 @@ while True:
 
 
 
-        time.sleep(10)
+        time.sleep(5)
 
         pack_num = pack_num + 1
         try:
-            s.sendto(msg + str(pack_num), (neighbor, myport))
+            s.sendto(msg + str(pack_num), ('ff03::1', myport))
             print('Sent message to %s'%(neighbor))
         except Exception:
             pass
-        time.sleep(20 + machine.rng()%20)
+        time.sleep(5 + machine.rng()%20)
 
     # random sleep time
-    time.sleep(5)
+    time.sleep(6)
