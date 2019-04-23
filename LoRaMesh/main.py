@@ -101,3 +101,39 @@ while True:
 
     # random sleep time
     time.sleep(6)
+
+
+
+    #Functions
+    #*****MNEED TO FIGURE OUT HOW TO GET A UNIQUE DEV ID
+    #MydevID = ????
+
+    def publicMessage(message,category,GPS,Timestamp):
+        FinalMessage = MydevID+message+category+GPS+Timestamp
+        try:
+            s.sendto(FinalMessage,('ff03::1', myport))
+            print('Sent message to Mesh')
+        except Exception:
+            pass
+            print(failed)
+
+    def directMessage(message,category,GPS,Timestamp,DeviceID):
+        FinalMessage = MydevID+message+category+GPS+Timestamp
+        try:
+            s.sendto(FinalMessage,(DeviceID, myport))
+            print('Sent message to' + DeviceID)
+        except Exception:
+            pass
+            print(failed)
+
+    def emergencyBeacon(GPS,Timestamp):
+        DefaultMessage = 'I have an immidiate emergency and my Phone is disabled'+'code for emergency Beacon***'+GPS+Timestamp
+        try:
+            s.sendto(DefaultMessage,('ff03::1', myport))
+            print('Sent message to Mesh')
+        except Exception:
+            pass
+            print(failed)
+
+    def syncDatabase():
+        print('nothing')
