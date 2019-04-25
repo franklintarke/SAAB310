@@ -8,7 +8,7 @@ import machine
 
 from loramesh import Loramesh
 
-pycom.wifi_on_boot(False)
+#pycom.wifi_on_boot(True)
 pycom.heartbeat(False)
 
 lora = LoRa(mode=LoRa.LORA, region=LoRa.US915, bandwidth=LoRa.BW_125KHZ, sf=7)
