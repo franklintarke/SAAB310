@@ -15,7 +15,11 @@ lora = LoRa(mode=LoRa.LORA, region=LoRa.US915, bandwidth=LoRa.BW_125KHZ, sf=7)
 MAC = str(ubinascii.hexlify(lora.mac()))[2:-1]
 print("LoRa MAC: %s"%MAC)
 
+
 mesh = Loramesh(lora)
+
+DevIP = mesh.ipaddr()[-2]
+print(DevIP)
 
 # waiting until it connected to Mesh network
 while True:
@@ -32,6 +36,11 @@ while True:
 s = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
 myport = 1234
 s.bind(myport)
+
+
+
+
+
 
 # handler responisble for receiving packets on UDP Pymesh socket
 def receive_pack():
@@ -71,7 +80,7 @@ while True:
     # update neighbors list
     neigbors = mesh.neighbors_ip()
     print("%d neighbors, IPv6 list: %s"%(len(neigbors), neigbors))
-
+    print(str(mesh.ipaddr()))
     # send PING and UDP packets to all neighbors
     for neighbor in neigbors:
         if mesh.ping(neighbor) > 0:
@@ -87,13 +96,13 @@ while True:
         else:
             print('No Pings from neighbors')
 
-
+        list = ['test1', 'test2' 'test3','test4','test5']
 
         time.sleep(5)
 
         pack_num = pack_num + 1
         try:
-            s.sendto(msg + str(pack_num), ('ff03::1', myport))
+            s.sendto(str(list) + msg + str(pack_num), ('ff03::1', myport))
             print('Sent message to %s'%(neighbor))
         except Exception:
             pass
@@ -107,6 +116,9 @@ while True:
     #Functions
     #*****MNEED TO FIGURE OUT HOW TO GET A UNIQUE DEV ID
     #MydevID = ????
+
+
+
 
     def publicMessage(message,category,GPS,Timestamp):
         FinalMessage = MydevID+message+category+GPS+Timestamp
