@@ -5,6 +5,10 @@ import utime
 import ubinascii
 import pycom
 import machine
+from machine import UART
+
+uart = machine.UART(0, 115200) #Baudrate for laptop communication
+#uart = machine.UART(0, 9600) #Baudrate for smartphone communication
 
 from loramesh import Loramesh
 
