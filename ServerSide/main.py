@@ -18,7 +18,6 @@ lora = LoRa(mode=LoRa.LORA, region=LoRa.US915, bandwidth=LoRa.BW_125KHZ, sf=7)
 MAC = str(ubinascii.hexlify(lora.mac()))[2:-1]
 print("LoRa MAC: %s"%MAC)
 
-
 mesh = Loramesh(lora)
 
 DevIP = mesh.ipaddr()[-2]
@@ -72,6 +71,15 @@ def receive_pack():
                 s.sendto('ACK ' + MAC + ' ' + str(rcv_data)[2:-1], (rcv_ip, rcv_port))
             except Exception:
                 pass
+        if rcv_data.startswith("makeGETrequest"):
+            try:
+                r = getRequest()
+                print(r.text)
+                s.sendto('ACK ' + MAC + ' ' + str(rcv_data)[2:-1], (rcv_ip, rcv_port))
+                print('Sent message '')
+                r.close()
+            except Exception:
+                pass
         mesh.blink(7, .3)
 
 pack_num = 1
@@ -114,12 +122,13 @@ while True:
 
         pack_num = pack_num + 1
         try:
-            r = getRequest()
-            print(r.text)
+            pass
+            #r = getRequest()
+            #print(r.text)
 
-            s.sendto(r.text, ('ff03::1', myport))
-            r.close()
-            print('Sent message to %s'%(neighbor))
+            #s.sendto(r.text, ('ff03::1', myport))
+            #r.close()
+            #print('Sent message to %s'%(neighbor))
         except Exception:
             pass
             print('failedtosend')

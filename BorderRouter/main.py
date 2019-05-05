@@ -1,4 +1,6 @@
 from network import WLAN
+import machine
+import usocket
 wlan = WLAN(mode=WLAN.STA)
 
 nets = wlan.scan()
@@ -11,6 +13,8 @@ for net in nets:
         print('WLAN connection succeeded!')
         break
 
-
-
-#eid_socket.sendto("01234567890123456789", ("1::2", 1235))
+sockaddr = usocket.getaddrinfo('www.micropython.org', 80)[0][-1]
+# You must use getaddrinfo() even for numeric addresses
+sockaddr = usocket.getaddrinfo('127.0.0.1', 80)[0][-1]
+# Now you can use that address
+sock.connect(addr)
