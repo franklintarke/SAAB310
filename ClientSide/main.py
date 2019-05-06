@@ -66,5 +66,5 @@ def receive_pack():
 
         mesh.blink(7, .3)
 
-
+ip = mesh.ip()
 mesh.mesh.rx_cb(receive_pack)

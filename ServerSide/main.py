@@ -75,10 +75,11 @@ def receive_pack():
             try:
                 r = getRequest()
                 print(r.text)
-                s.sendto('ACK ' + MAC + ' ' + str(rcv_data)[2:-1], (rcv_ip, rcv_port))
+                s.sendto(r.text, ('ff03::1', myport))
                 print('Sent DatabaseGET')
                 r.close()
             except Exception:
+                print('db message failed')
                 pass
         mesh.blink(7, .3)
 
@@ -91,7 +92,7 @@ mesh.mesh.rx_cb(receive_pack)
 while True:
     mesh.led_state()
     print("%d: State %s, single %s, IP %s"%(time.time(), mesh.cli('state'), mesh.cli('singleton'), mesh.ip()))
-
+    s.sendto('test', ('ff03::1', myport))
     # check if topology changes, maybe RLOC IPv6 changed
     new_ip = mesh.ip()
     if ip != new_ip:
@@ -136,44 +137,3 @@ while True:
 
     # random sleep time
     time.sleep(6)
-
-
-
-    #Functions
-    #*****MNEED TO FIGURE OUT HOW TO GET A UNIQUE DEV ID
-    #MydevID = ????
-
-
-
-
-
-
-def publicMessage(message,category,GPS,Timestamp):
-    FinalMessage = MydevID+message+category+GPS+Timestamp
-    try:
-        s.sendto(FinalMessage,('ff03::1', myport))
-        print('Sent message to Mesh')
-    except Exception:
-        pass
-        print(failed)
-
-def directMessage(message,category,GPS,Timestamp,DeviceID):
-    FinalMessage = MydevID+message+category+GPS+Timestamp
-    try:
-        s.sendto(FinalMessage,(DeviceID, myport))
-        print('Sent message to' + DeviceID)
-    except Exception:
-        pass
-        print(failed)
-
-def emergencyBeacon(GPS,Timestamp):
-    DefaultMessage = 'I have an immidiate emergency and my Phone is disabled'+'code for emergency Beacon***'+GPS+Timestamp
-    try:
-        s.sendto(DefaultMessage,('ff03::1', myport))
-        print('Sent message to Mesh')
-    except Exception:
-        pass
-        print(failed)
-
-def syncDatabase():
-    print('nothing')
