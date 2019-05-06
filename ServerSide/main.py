@@ -36,7 +36,7 @@ while True:
     mesh.led_state()
     print("%d: State %s, single %s"%(time.time(), mesh.cli('state'), mesh.cli('singleton')))
     printsomething()
-    getRequest()
+    #getRequest()
     time.sleep(2)
     if not mesh.is_connected():
         continue
@@ -76,7 +76,7 @@ def receive_pack():
                 r = getRequest()
                 print(r.text)
                 s.sendto('ACK ' + MAC + ' ' + str(rcv_data)[2:-1], (rcv_ip, rcv_port))
-                print('Sent message '')
+                print('Sent DatabaseGET')
                 r.close()
             except Exception:
                 pass

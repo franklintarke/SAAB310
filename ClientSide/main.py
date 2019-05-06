@@ -63,13 +63,8 @@ def receive_pack():
                 s.sendto('ACK ' + MAC + ' ' + str(rcv_data)[2:-1], (rcv_ip, rcv_port))
             except Exception:
                 pass
-        if rcv_data.startswith("makeGETrequest"):
-            try:
-                r = getRequest()
-                print(r.text)
-                s.sendto('ACK ' + MAC + ' ' + str(rcv_data)[2:-1], (rcv_ip, rcv_port))
-                print('Sent message ')
-                r.close()
-            except Exception:
-                pass
+
         mesh.blink(7, .3)
+
+
+mesh.mesh.rx_cb(receive_pack)
