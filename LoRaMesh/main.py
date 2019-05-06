@@ -37,7 +37,7 @@ while True:
     mesh.led_state()
     print("%d: State %s, single %s"%(time.time(), mesh.cli('state'), mesh.cli('singleton')))
     printsomething()
-    getRequest()
+    #getRequest()
     time.sleep(2)
     if not mesh.is_connected():
         continue
@@ -117,7 +117,7 @@ while True:
             r = getRequest()
             print(r.text)
 
-            s.sendto(r.text, ('ff03::1', myport))
+            s.sendto('test', ('ff03::1', myport))
             r.close()
             print('Sent message to %s'%(neighbor))
         except Exception:
