@@ -10,9 +10,12 @@ try:
 except ImportError:
     import requests
 from loramesh import Loramesh
+import struct
 
 pycom.wifi_on_boot(True)
-pycom.heartbeat(False)
+pycom.heartbeat(False
+border_router_net = "2001:dead:beef:cafe::/64"
+
 
 lora = LoRa(mode=LoRa.LORA, region=LoRa.US915, bandwidth=LoRa.BW_125KHZ, sf=7)
 MAC = str(ubinascii.hexlify(lora.mac()))[2:-1]
