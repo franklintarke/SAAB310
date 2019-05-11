@@ -11,7 +11,20 @@ except ImportError:
     import requests
 from loramesh import Loramesh
 
-pycom.wifi_on_boot(True)
+from network import WLAN
+wlan = WLAN(mode=WLAN.STA)
+
+nets = wlan.scan()
+for net in nets:
+    if net.ssid == 'FrankliniPhone':
+        print('Network found!')
+        wlan.connect(net.ssid, auth=(net.sec, '12345678'), timeout=5000)
+        while not wlan.isconnected():
+            machine.idle() # save power while waiting
+        print('WLAN connection succeeded!')
+        break
+
+#pycom.wifi_on_boot(True)
 pycom.heartbeat(False)
 
 lora = LoRa(mode=LoRa.LORA, region=LoRa.US915, bandwidth=LoRa.BW_125KHZ, sf=7)

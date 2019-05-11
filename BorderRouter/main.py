@@ -73,7 +73,7 @@ myport = 1235
 ip = "::" # in this case, socket can be bind just on a port, like: eid_socket.bind(myport)
 if ip is not None:
     eid_socket.bind((ip, myport))
-    #eid_socket.bind(myport)
+    eid_socket.bind(myport)
     print("Created socked for (%s, %d)"%(ip, myport))
 sockets.append(eid_socket)
 

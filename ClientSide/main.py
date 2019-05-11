@@ -33,17 +33,25 @@ s = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
 myport = 1234
 s.bind(myport)
 
+hubAddresses = ['fdde:ad00:beef:0:9148:2412:984:42a1','fdde:ad00:beef:0:6834:9acd:e673:b95c']
 
+hubCounter =0
 
-def MakeGETRequest():
-
+def makeGETRequest():
+    global hubCounter
+    if hubCounter >= 2:
+        hubCounter = 0
     try:
-        s.sendto('makeGETrequest', ('ff03::1', myport))
+        s.sendto('makeGETrequest', (hubAddresses[hubCounter], myport))   #hubAddresses[hubCounter]
         print('Sent GET request')
+        print(hubAddresses[hubCounter])
+        hubCounter = hubCounter + 1;
+
+
     except Exception:
         pass
         print('failedtosend')
-    time.sleep(5 + machine.rng()%20)
+    time.sleep(5)
 
 
 # handler responisble for receiving packets on UDP Pymesh socket
