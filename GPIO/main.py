@@ -10,7 +10,7 @@ led_GREEN = PWM(0, frequency)
 led_GREEN.channel(0,pin='P9', duty_cycle=0.1)
 
 led_BLUE = PWM(0, frequency)
-led_BLUE.channel(1,pin='P10', duty_cycle=0)
+led_BLUE.channel(1,pin='P10', duty_cycle=0.5)
 
 led_RED = PWM(0, frequency)
 led_RED.channel(2,pin='P11', duty_cycle=1)

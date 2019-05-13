@@ -13,6 +13,7 @@ from loramesh import Loramesh
 
 pycom.wifi_on_boot(True)
 pycom.heartbeat(False)
+pycom.rgbled(0x000000)
 
 lora = LoRa(mode=LoRa.LORA, region=LoRa.US915, bandwidth=LoRa.BW_125KHZ, sf=7)
 MAC = str(ubinascii.hexlify(lora.mac()))[2:-1]
@@ -35,6 +36,9 @@ s.bind(myport)
 
 hubAddresses = ['fdde:ad00:beef:0:9148:2412:984:42a1','fdde:ad00:beef:0:6834:9acd:e673:b95c']
 
+everyone = 'ff03::1'
+
+
 hubCounter =0
 
 def makeGETRequest():
@@ -42,7 +46,7 @@ def makeGETRequest():
     if hubCounter >= 2:
         hubCounter = 0
     try:
-        s.sendto('makeGETrequest', (hubAddresses[hubCounter], myport))   #hubAddresses[hubCounter]
+        s.sendto('makeGETrequest', (everyone, myport))   #hubAddresses[hubCounter]
         print('Sent GET request')
         print(hubAddresses[hubCounter])
         hubCounter = hubCounter + 1;

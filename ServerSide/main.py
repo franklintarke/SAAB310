@@ -26,6 +26,7 @@ for net in nets:
 
 #pycom.wifi_on_boot(True)
 pycom.heartbeat(False)
+pycom.rgbled(0x000000)
 
 lora = LoRa(mode=LoRa.LORA, region=LoRa.US915, bandwidth=LoRa.BW_125KHZ, sf=7)
 MAC = str(ubinascii.hexlify(lora.mac()))[2:-1]
