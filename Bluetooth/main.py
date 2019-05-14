@@ -26,11 +26,13 @@ def char1_cb_handler(chr):
     events = chr.events()
     if  events & Bluetooth.CHAR_WRITE_EVENT:
         print("Write request with value = {}".format(chr.value()))
-    else:
-        if char1_read_counter < 3:
-            print('Read request on char 1')
-        else:
-            return 'ABC DEF'
+    if events & Bluetooth.CHAR_READ_EVENT:
+        return 'This is the LoPy'
+    #else:
+    #    if char1_read_counter < 3:
+    #        print('Read request on char 1')
+    #    else:
+        #    return 'ABC DEF'
 
 char1_cb = chr1.callback(trigger=Bluetooth.CHAR_WRITE_EVENT | Bluetooth.CHAR_READ_EVENT, handler=char1_cb_handler)
 
