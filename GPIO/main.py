@@ -22,42 +22,34 @@ led_RED.channel(2,pin='P11', duty_cycle=1)
 
 
 chrono = Timer.Chrono()
-timer = Timer.Alarm(None, 1.5, periodic = False)
+timer = Timer.Alarm(None, .2, periodic = False)
+timer2 = Timer.Alarm(None, 3, periodic = False)
 
-btn = Pin('P21', mode=Pin.IN, pull=Pin.PULL_UP)
+btn = Pin('P21', mode=  Pin.IN, pull=Pin.PULL_UP)
 
-def long(count):
-   print('Long Press',count)
+def long_press_handler(alarm):
+    print("****** LONG PRESS HANDLER ******")
 
-def short(count):
-   print('Short Press',count)
+def single_press_handler():
+    print("****** BUTTON PRESSED ******")
 
-count = 0
-butms = 0
-val = 0
 def btn_press_detected(arg):
-  global butms, count
-  now = time.ticks_ms()
-  if butms == 0: butms = now
-  else:
-    if butms == now: return
-  i = 0
-  while i < 10:
-    time.sleep_ms(1)
-    if pin() == 1: i = 0
-    else: i+=1
-  while pin() == 0:
-    i+=1
-    if(i > 1000): break
-    time.sleep_ms(1)
+    global chrono,  timer, timer2
+    try:
+        val = btn()
+        if 0 == val:
+            chrono.reset()
+            chrono.start()
+            timer.callback(long_press_handler)
+            timer2.callback(single_press_handler)
+        else:
+            timer.callback(None)
+            chrono.stop()
+            t = chrono.read_ms()
+            if (t > 30) & (t < 200):
+                pass
+                #single_press_handler()
+    finally:
+        gc.collect()
 
-    if(i>1000):
-        long(count)
-    else:
-        short(count)
-    arg = 1
-
-    return val = arg
-
-
-btn.callback(Pin.IRQ_FALLING | Pin.IRQ_RISING,  btn_press_detected, val)
+btn.callback(Pin.IRQ_FALLING | Pin.IRQ_RISING,  btn_press_detected)
