@@ -53,7 +53,7 @@ def receive_pack():
         mesh.blink(7, .3)
 
 pack_num = 1
-msg = "Hello World! MAC: " + MAC + ", pack: "
+msg = str({"posts":{"id":1,"username":"Cardi B.","phoneNum":"-122.173675","latitude":37.425355,"longitude":0.048159022,"distance":0.048159022}})
 ip = mesh.ip()
 mesh.mesh.rx_cb(receive_pack)
 

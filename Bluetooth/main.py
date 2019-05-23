@@ -37,13 +37,3 @@ def char1_cb_handler(chr):
 char1_cb = chr1.callback(trigger=Bluetooth.CHAR_WRITE_EVENT | Bluetooth.CHAR_READ_EVENT, handler=char1_cb_handler)
 
 srv2 = bluetooth.service(uuid=1234, isprimary=True)
-
-chr2 = srv2.characteristic(uuid=4567, value=0x1234)
-char2_read_counter = 0xF0
-def char2_cb_handler(chr):
-    global char2_read_counter
-    char2_read_counter += 1
-    if char2_read_counter > 0xF1:
-        return char2_read_counter
-
-char2_cb = chr2.callback(trigger=Bluetooth.CHAR_READ_EVENT, handler=char2_cb_handler)

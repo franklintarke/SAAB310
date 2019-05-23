@@ -1,61 +1,40 @@
-from network import LoRa
-import socket
+import machine
+import math
+import network
+import os
 import time
 import utime
+import gc
+from machine import RTC
+from machine import SD
+from L76GNSS import L76GNSS
+from pytrack import Pytrack
+
+from network import LoRa
+import socket
 import ubinascii
 import pycom
-import machine
-try:
-    import urequests as requests
-except ImportError:
-    import requests
+
 from loramesh import Loramesh
 
-from network import WLAN
-wlan = WLAN(mode=WLAN.STA)
+time.sleep(2)
+gc.enable()
+py = Pytrack()
+l76 = L76GNSS(py, timeout=30)
 
-nets = wlan.scan()
-for net in nets:
-    if net.ssid == 'FrankliniPhone':
-        print('Network found!')
-        wlan.connect(net.ssid, auth=(net.sec, '12345678'), timeout=5000)
-        while not wlan.isconnected():
-            machine.idle() # save power while waiting
-        print('WLAN connection succeeded!')
-        break
-
-pycom.wifi_on_boot(True)
+pycom.wifi_on_boot(False)
 pycom.heartbeat(False)
-pycom.rgbled(0x000000)
 
-lora = LoRa(mode=LoRa.LORA, region=LoRa.US915, bandwidth=LoRa.BW_125KHZ, sf=7)
+lora = LoRa(mode=LoRa.LORA, region=LoRa.EU868, bandwidth=LoRa.BW_125KHZ, sf=7)
 MAC = str(ubinascii.hexlify(lora.mac()))[2:-1]
 print("LoRa MAC: %s"%MAC)
 
 mesh = Loramesh(lora)
 
-DevIP = mesh.ipaddr()[-2]
-print(DevIP)
-
-def printsomething():
-    print('hi')
-#decode from base64, split by spaces, string.split, get 2nd item
-def getRequest(value):
-    r = requests.get('http://172.20.10.12:3000/'+value)
-    print(r.text)
-    return r
-
-def POSTRequest(content):
-    r = requests.post('http://172.20.10.2:3000/',data = 'testdata')
-    print(r.text)
-
-
 # waiting until it connected to Mesh network
 while True:
     mesh.led_state()
     print("%d: State %s, single %s"%(time.time(), mesh.cli('state'), mesh.cli('singleton')))
-    printsomething()
-    #getRequest()
     time.sleep(2)
     if not mesh.is_connected():
         continue
@@ -67,8 +46,6 @@ while True:
 s = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
 myport = 1234
 s.bind(myport)
-
-
 
 # handler responisble for receiving packets on UDP Pymesh socket
 def receive_pack():
@@ -87,22 +64,9 @@ def receive_pack():
                 s.sendto('ACK ' + MAC + ' ' + str(rcv_data)[2:-1], (rcv_ip, rcv_port))
             except Exception:
                 pass
-        if rcv_data.startswith("makeGETrequest"):
-            try:
-                r = getRequest()
-                print(r.text)
-                s.sendto(r.text, ('ff03::1', myport))
-                print('Sent DatabaseGET')
-                r.close()
-
-
-            except Exception:
-                print('db message failed')
-                pass
         mesh.blink(7, .3)
 
 pack_num = 1
-msg = "Hello World Frank! MAC: " + MAC + ", pack: "
 ip = mesh.ip()
 mesh.mesh.rx_cb(receive_pack)
 
@@ -110,7 +74,7 @@ mesh.mesh.rx_cb(receive_pack)
 while True:
     mesh.led_state()
     print("%d: State %s, single %s, IP %s"%(time.time(), mesh.cli('state'), mesh.cli('singleton'), mesh.ip()))
-    #s.sendto('test', ('ff03::1', myport))
+
     # check if topology changes, maybe RLOC IPv6 changed
     new_ip = mesh.ip()
     if ip != new_ip:
@@ -120,7 +84,7 @@ while True:
     # update neighbors list
     neigbors = mesh.neighbors_ip()
     print("%d neighbors, IPv6 list: %s"%(len(neigbors), neigbors))
-    print(str(mesh.ipaddr()))
+
     # send PING and UDP packets to all neighbors
     for neighbor in neigbors:
         if mesh.ping(neighbor) > 0:
@@ -129,17 +93,16 @@ while True:
         else:
             print('Ping not received from neighbor %s'%neighbor)
 
-        #Ping Everyone
-        if mesh.ping('ff03::1') > 0:
-            print('Ping received from neighbors')
+        time.sleep(10)
 
-        else:
-            print('No Pings from neighbors')
-
-
-        time.sleep(5)
-
-        time.sleep(5 + machine.rng()%20)
+        pack_num = pack_num + 1
+        try:
+            coord = l76.coordinates()
+            s.sendto(coord + str(pack_num), (neighbor, myport))
+            print('Sent message to %s'%(neighbor))
+        except Exception:
+            pass
+        time.sleep(20 + machine.rng()%20)
 
     # random sleep time
-    time.sleep(6)
+    time.sleep(30 + machine.rng()%30)
