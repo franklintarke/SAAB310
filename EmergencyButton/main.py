@@ -55,15 +55,16 @@ def btn_press_detected(arg):
             chrono.start()
             timer.callback(long_press_handler)
             timer2.callback(single_press_handler)
-        #else:
-            #timer.callback(None)
-            #chrono.stop()
-            #t = chrono.read_ms()
-            #if (t > 30) & (t < 200):
-                #pass
+        else:
+            timer.callback(None)
+            chrono.stop()
+            t = chrono.read_ms()
+            if (t > 30) & (t < 200):
+                pass
                 #single_press_handler()
     finally:
-        gc.collect()
+        pass
+        #gc.collect()
 
 btn.callback(Pin.IRQ_FALLING | Pin.IRQ_RISING,  btn_press_detected)
 

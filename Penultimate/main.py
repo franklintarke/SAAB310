@@ -70,9 +70,9 @@ def char1_cb_handler(chr):
     if  events & Bluetooth.CHAR_WRITE_EVENT:
         print("Write request with value = {}".format(chr.value()))
         #Call method to do GET Request
-        if chr.value().decode("utf-8") == 'GET':
+        if chr.value().decode("utf-8").startswith('GET'):
             makeGETRequest()
-        if chr.value().decode("utf-8") == 'POST':
+        if chr.value().decode("utf-8").startswith('POST'):
             makePOSTRequest()
 
 
@@ -112,20 +112,6 @@ def makeGETRequest():
         print('failedtosend')
     time.sleep(5)
 
-def makePOSTRequest(data):
-    global hubCounter
-    if hubCounter >= 2:
-        hubCounter = 0
-    try:
-        s.sendto('makePOSTrequest', (everyone, myport))   #hubAddresses[hubCounter]
-        print('Sent POST request')
-        print(hubAddresses[hubCounter])
-        hubCounter = hubCounter + 1;
-    except Exception:
-        pass
-        print('failedtosend')
-    time.sleep(5)
-
 #*************RECEIVE MESSAGE HANDLER****************
 packageList = []
 def receive_pack():
@@ -157,59 +143,49 @@ mesh.mesh.rx_cb(receive_pack)
 
 #**********BUTTON DETECTION**************
 
-chrono = Timer.Chrono()
-timer = Timer.Alarm(None, 3, periodic = False)
-timer2 = Timer.Alarm(None, .2, periodic = False)
-btn = Pin('P21', mode=  Pin.IN, pull=Pin.PULL_UP)
-emergencymode = 0;
+emergencymode = 0
 
-def long_press_handler(alarm):
-    #EMERGENCY BUTTON
-    global emergencymode
-    fastBlinkLED()
+def short():
+  print('Check Charge')
+  #getBatteryCharge()
 
-    print("****** EMERGENCY BUTTON ******")
-    if emergencymode == 0:
-        emergencymode = 1
-        #gpsCoords = getGPS()
-        try:
-            s.sendto('emergency' + str(coords), (everyone, myport))   #hubAddresses[hubCounter]
-            print('Sent EMERGENCY beacon')
-            print('hubct' + str(hubAddresses[hubCounter]))
-            hubCounter = hubCounter + 1;
-        except Exception:
-            pass
-            print('failedtosend EMERGENCY')
-        time.sleep(5)
-    else:
-        emergencymode =0
-    print(emergencymode)
+def long():
+  global emergencymode
+  global hubCounter
+  fastBlinkLED()
+  print("****** EMERGENCY BUTTON ******")
+  if emergencymode == 0:
+      emergencymode = 1
+      try:
+          gpsCoords = getGPS()
+          s.sendto('emergency', (everyone, myport))   #hubAddresses[hubCounter]
+          print('Sent EMERGENCY beacon')
+          print('hubct' + str(hubAddresses[hubCounter]))
+          hubCounter = hubCounter + 1;
+          for x in range(1):
+              led_GREEN.channel(0,pin='P20', duty_cycle=1)
+              time.sleep_ms(1000)
+              led_GREEN.channel(0,pin='P20', duty_cycle=0)
+              time.sleep_ms(100)
+      except Exception:
+          pass
+          print('failedtosend EMERGENCY')
 
-def single_press_handler(alarm):
-    #CHECK POWER
-    #getBatteryCharge()
-    print("****** CHECK POWER ******")
+  else:
+      emergencymode =0
+      print('emergencymodeOFF')
+      for x in range(1):
+        led_RED.channel(2,pin='P19', duty_cycle=.8)
+        time.sleep_ms(1000)
+        led_RED.channel(2,pin='P19', duty_cycle=0)
+        time.sleep_ms(100)
 
-def btn_press_detected(arg):
-    global chrono,  timer, timer2
-    try:
-        val = btn()
-        if 0 == val:
-            chrono.reset()
-            chrono.start()
-            timer.callback(long_press_handler)
-            timer2.callback(single_press_handler)
-        else:
-            timer.callback(None)
-            chrono.stop()
-            t = chrono.read_ms()
-            if (t > 30) & (t < 200):
-                pass
-                #single_press_handler()
-    finally:
-        gc.collect()
+import button
+but = button.BUTTON()
+but.short = short
+but.long = long
 
-#btn.callback(Pin.IRQ_FALLING | Pin.IRQ_RISING,  btn_press_detected)
+
 
 
 #******************GPS CODE*********************
@@ -242,9 +218,10 @@ def getTime():
 #****************BlinkLED**********
 frequency = 5000
 led_RED = PWM(0, frequency)
+led_GREEN = PWM(0, frequency)
 def fastBlinkLED():
     for x in range(10):
-        led_RED.channel(2,pin='P11', duty_cycle=1)
+        led_RED.channel(2,pin='P19', duty_cycle=1)
         time.sleep_ms(100)
-        led_RED.channel(2,pin='P11', duty_cycle=0)
+        led_RED.channel(2,pin='P19', duty_cycle=0)
         time.sleep_ms(100)

@@ -4,6 +4,7 @@ import time
 import utime
 import ubinascii
 import pycom
+import base64
 import machine
 try:
     import urequests as requests
@@ -36,18 +37,13 @@ mesh = Loramesh(lora)
 
 DevIP = mesh.ipaddr()[-2]
 print(DevIP)
-
-def printsomething():
-    print('hi')
 #decode from base64, split by spaces, string.split, get 2nd item
-def getRequest(value):
-    r = requests.get('http://172.20.10.12:3000/'+value)
+
+
+def Request(value,info):
+    r = requests.get('http://172.20.10.12:3000/'+value, data = info )
     print(r.text)
     return r
-
-def POSTRequest(content):
-    r = requests.post('http://172.20.10.2:3000/',data = 'testdata')
-    print(r.text)
 
 
 # waiting until it connected to Mesh network
@@ -89,7 +85,10 @@ def receive_pack():
                 pass
         if rcv_data.startswith("makeGETrequest"):
             try:
-                r = getRequest()
+                parsed = base64.decode(rcv_data) .split(' ')
+                value = parsed[1]
+                info = parsed[2]
+                r = Request(value,info)
                 print(r.text)
                 s.sendto(r.text, ('ff03::1', myport))
                 print('Sent DatabaseGET')
