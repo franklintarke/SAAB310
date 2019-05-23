@@ -17,7 +17,6 @@ led_RED = PWM(0, frequency)
 led_RED.channel(2,pin='P19', duty_cycle=1)
 
 
-
 chrono = Timer.Chrono()
 timer = Timer.Alarm(None, .2, periodic = False)
 timer2 = Timer.Alarm(None, 3, periodic = False)

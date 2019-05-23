@@ -27,6 +27,7 @@ import os
 import utime
 from L76GNSS import L76GNSS
 from pytrack import Pytrack
+import math
 
 #*******SETUP CODE****************
 pycom.wifi_on_boot(False)
@@ -147,7 +148,7 @@ emergencymode = 0
 
 def short():
   print('Check Charge')
-  #getBatteryCharge()
+  getBatteryCharge()
 
 def long():
   global emergencymode
@@ -158,7 +159,7 @@ def long():
       emergencymode = 1
       try:
           gpsCoords = getGPS()
-          s.sendto('emergency', (everyone, myport))   #hubAddresses[hubCounter]
+          s.sendto('Emergency!' + str(gpsCoords), (everyone, myport))   #hubAddresses[hubCounter]
           print('Sent EMERGENCY beacon')
           print('hubct' + str(hubAddresses[hubCounter]))
           hubCounter = hubCounter + 1;
@@ -202,8 +203,57 @@ def getGPS():
 
 def getBatteryCharge():
     py = Pytrack()
-    py.read_battery_voltage()
-    print(py.read_battery_voltage())
+    charge = py.read_battery_voltage()
+    print(charge)
+    percentage = charge*23.9
+
+    if percentage >= 80:
+          for x in range(4):
+              led_GREEN.channel(0,pin='P20', duty_cycle=1)
+              time.sleep_ms(500)
+              led_GREEN.channel(0,pin='P20', duty_cycle=0)
+              time.sleep_ms(100)
+
+    elif percentage >= 60 and percentage <= 80:
+          for x in range(3):
+              led_GREEN.channel(0,pin='P20', duty_cycle=1)
+              time.sleep_ms(500)
+              led_GREEN.channel(0,pin='P20', duty_cycle=0)
+              time.sleep_ms(100)
+          led_RED.channel(2,pin='P19', duty_cycle=1)
+          time.sleep_ms(500)
+          led_RED.channel(2,pin='P19', duty_cycle=0)
+          time.sleep_ms(100)
+
+    elif percentage >=40 and percentage <= 60:
+          for x in range(2):
+              led_GREEN.channel(0,pin='P20', duty_cycle=1)
+              time.sleep_ms(500)
+              led_GREEN.channel(0,pin='P20', duty_cycle=0)
+              time.sleep_ms(100)
+          for x in range(2):
+            led_RED.channel(2,pin='P19', duty_cycle=1)
+            time.sleep_ms(500)
+            led_RED.channel(2,pin='P19', duty_cycle=0)
+            time.sleep_ms(100)
+    elif percentage >=20 and percentage <= 40:
+          for x in range(1):
+              led_GREEN.channel(0,pin='P20', duty_cycle=1)
+              time.sleep_ms(500)
+              led_GREEN.channel(0,pin='P20', duty_cycle=0)
+              time.sleep_ms(100)
+          for x in range(3):
+              led_RED.channel(2,pin='P19', duty_cycle=1)
+              time.sleep_ms(500)
+              led_RED.channel(2,pin='P19', duty_cycle=0)
+              time.sleep_ms(100)
+    else:
+          for x in range(4):
+              led_RED.channel(2,pin='P19', duty_cycle=1)
+              time.sleep_ms(500)
+              led_RED.channel(2,pin='P19', duty_cycle=0)
+              time.sleep_ms(100)
+
 
 #****************Get Current Time***************
 #Needs adjustment, RTC not avialable without internet

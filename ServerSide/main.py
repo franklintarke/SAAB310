@@ -50,7 +50,7 @@ def Request(value,info):
 while True:
     mesh.led_state()
     print("%d: State %s, single %s"%(time.time(), mesh.cli('state'), mesh.cli('singleton')))
-    printsomething()
+    #printsomething()
     #getRequest()
     time.sleep(2)
     if not mesh.is_connected():
@@ -81,6 +81,12 @@ def receive_pack():
         if rcv_data.startswith("Hello"):
             try:
                 s.sendto('ACK ' + MAC + ' ' + str(rcv_data)[2:-1], (rcv_ip, rcv_port))
+            except Exception:
+                pass
+        if rcv_data.startswith("Emergency!"):
+            try:
+                s.sendto('ACK ' + MAC + ' ' + str(rcv_data)[2:-1], (rcv_ip, rcv_port))
+                print('Write to Emergency Beacon Section')
             except Exception:
                 pass
         if rcv_data.startswith("makeGETrequest"):
