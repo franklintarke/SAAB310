@@ -4,7 +4,7 @@ import gc
 
 class BUTTON:
 
-  def __init__(self,pid='P22',longms=1000):
+  def __init__(self,pid='P4',longms=1000):
     self.longms = longms
     self.butms = 0
     self.pin = Pin(pid, mode=Pin.IN, pull=Pin.PULL_UP)

@@ -164,9 +164,9 @@ def long():
           print('hubct' + str(hubAddresses[hubCounter]))
           hubCounter = hubCounter + 1;
           for x in range(1):
-              led_GREEN.channel(0,pin='P20', duty_cycle=1)
+              led_GREEN.channel(0,pin='P10', duty_cycle=1)
               time.sleep_ms(1000)
-              led_GREEN.channel(0,pin='P20', duty_cycle=0)
+              led_GREEN.channel(0,pin='P10', duty_cycle=0)
               time.sleep_ms(100)
       except Exception:
           pass
@@ -176,9 +176,9 @@ def long():
       emergencymode =0
       print('emergencymodeOFF')
       for x in range(1):
-        led_RED.channel(2,pin='P19', duty_cycle=.8)
+        led_RED.channel(2,pin='P9', duty_cycle=.8)
         time.sleep_ms(1000)
-        led_RED.channel(2,pin='P19', duty_cycle=0)
+        led_RED.channel(2,pin='P9', duty_cycle=0)
         time.sleep_ms(100)
 
 import button
@@ -209,49 +209,49 @@ def getBatteryCharge():
 
     if percentage >= 80:
           for x in range(4):
-              led_GREEN.channel(0,pin='P20', duty_cycle=1)
+              led_GREEN.channel(0,pin='P10', duty_cycle=1)
               time.sleep_ms(500)
-              led_GREEN.channel(0,pin='P20', duty_cycle=0)
+              led_GREEN.channel(0,pin='P10', duty_cycle=0)
               time.sleep_ms(100)
 
     elif percentage >= 60 and percentage <= 80:
           for x in range(3):
-              led_GREEN.channel(0,pin='P20', duty_cycle=1)
+              led_GREEN.channel(0,pin='P10', duty_cycle=1)
               time.sleep_ms(500)
-              led_GREEN.channel(0,pin='P20', duty_cycle=0)
+              led_GREEN.channel(0,pin='P10', duty_cycle=0)
               time.sleep_ms(100)
-          led_RED.channel(2,pin='P19', duty_cycle=1)
+          led_RED.channel(2,pin='P9', duty_cycle=1)
           time.sleep_ms(500)
-          led_RED.channel(2,pin='P19', duty_cycle=0)
+          led_RED.channel(2,pin='P9', duty_cycle=0)
           time.sleep_ms(100)
 
     elif percentage >=40 and percentage <= 60:
           for x in range(2):
-              led_GREEN.channel(0,pin='P20', duty_cycle=1)
+              led_GREEN.channel(0,pin='P10', duty_cycle=1)
               time.sleep_ms(500)
-              led_GREEN.channel(0,pin='P20', duty_cycle=0)
+              led_GREEN.channel(0,pin='P10', duty_cycle=0)
               time.sleep_ms(100)
           for x in range(2):
-            led_RED.channel(2,pin='P19', duty_cycle=1)
+            led_RED.channel(2,pin='P9', duty_cycle=1)
             time.sleep_ms(500)
-            led_RED.channel(2,pin='P19', duty_cycle=0)
+            led_RED.channel(2,pin='P9', duty_cycle=0)
             time.sleep_ms(100)
     elif percentage >=20 and percentage <= 40:
           for x in range(1):
-              led_GREEN.channel(0,pin='P20', duty_cycle=1)
+              led_GREEN.channel(0,pin='P10', duty_cycle=1)
               time.sleep_ms(500)
-              led_GREEN.channel(0,pin='P20', duty_cycle=0)
+              led_GREEN.channel(0,pin='P10', duty_cycle=0)
               time.sleep_ms(100)
           for x in range(3):
-              led_RED.channel(2,pin='P19', duty_cycle=1)
+              led_RED.channel(2,pin='P9', duty_cycle=1)
               time.sleep_ms(500)
-              led_RED.channel(2,pin='P19', duty_cycle=0)
+              led_RED.channel(2,pin='P9', duty_cycle=0)
               time.sleep_ms(100)
     else:
           for x in range(4):
-              led_RED.channel(2,pin='P19', duty_cycle=1)
+              led_RED.channel(2,pin='P9', duty_cycle=1)
               time.sleep_ms(500)
-              led_RED.channel(2,pin='P19', duty_cycle=0)
+              led_RED.channel(2,pin='P9', duty_cycle=0)
               time.sleep_ms(100)
 
 
@@ -271,7 +271,7 @@ led_RED = PWM(0, frequency)
 led_GREEN = PWM(0, frequency)
 def fastBlinkLED():
     for x in range(10):
-        led_RED.channel(2,pin='P19', duty_cycle=1)
+        led_RED.channel(2,pin='P9', duty_cycle=1)
         time.sleep_ms(100)
-        led_RED.channel(2,pin='P19', duty_cycle=0)
+        led_RED.channel(2,pin='P9', duty_cycle=0)
         time.sleep_ms(100)
