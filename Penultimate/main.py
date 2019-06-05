@@ -245,9 +245,9 @@ def getBatteryCharge():
               time.sleep_ms(500)
               led_GREEN.channel(0,pin='P10', duty_cycle=0)
               time.sleep_ms(100)
-          led_RED.channel(2,pin='P19', duty_cycle=1)
+          led_RED.channel(2,pin='P9', duty_cycle=1)
           time.sleep_ms(500)
-          led_RED.channel(2,pin='P19', duty_cycle=0)
+          led_RED.channel(2,pin='P9', duty_cycle=0)
           time.sleep_ms(100)
 
     elif percentage >=40 and percentage <= 60:
