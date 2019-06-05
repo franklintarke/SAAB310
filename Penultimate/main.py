@@ -28,6 +28,7 @@ import utime
 from L76GNSS import L76GNSS
 from pytrack import Pytrack
 import math
+import json
 
 #*******SETUP CODE****************
 pycom.wifi_on_boot(False)
@@ -61,26 +62,43 @@ bluetooth.advertise(True)
 srv1 = bluetooth.service(uuid=b'SAABlopy12345678', isprimary=True)
 
 chr1 = srv1.characteristic(uuid=b'ab34567890123456', value=5)
-
+writeData =''
 char1_read_counter = 0
 def char1_cb_handler(chr):
     global char1_read_counter
+    global writeData
     char1_read_counter += 1
 
     events = chr.events()
     if  events & Bluetooth.CHAR_WRITE_EVENT:
         print("Write request with value = {}".format(chr.value()))
         #Call method to do GET Request
-        if chr.value().decode("utf-8").startswith('GET'):
-            makeGETRequest()
-        if chr.value().decode("utf-8").startswith('POST'):
-            makePOSTRequest()
+        req = chr.value().decode("utf-8")
+        writeData += req
+        if writeData.endswith('END'):
+            if writeData.startswith('GET'):
+                makeGETRequest(writeData.split(';')[1])
+                writeData = ''
+            if writeData.startswith('POST'):
+                writeData += req
+                makePOSTRequest(writeData.split(';')[1],writeData.split(';')[2])
+                writeData = ''
 
 
     if events & Bluetooth.CHAR_READ_EVENT:
         global packageList
-        data = str(packageList)
-        packageList = []
+        global headerList
+        datalist = []
+        print('READ')
+
+        data = headerList[:20]
+        print(data)
+        headerList = headerList[20:]
+        print(headerList)
+
+
+        #packageList = []
+        #headerList = []
         return data
 
 char1_cb = chr1.callback(trigger=Bluetooth.CHAR_WRITE_EVENT | Bluetooth.CHAR_READ_EVENT, handler=char1_cb_handler)
@@ -99,34 +117,50 @@ everyone = 'ff03::1'
 
 hubCounter =0
 
-def makeGETRequest():
+def makeGETRequest(endpoint):
     global hubCounter
     if hubCounter >= 2:
         hubCounter = 0
     try:
-        s.sendto('makeGETrequest', (everyone, myport))   #hubAddresses[hubCounter]
+        s.sendto('makeGETrequest' + ';' + endpoint, (everyone, myport))   #hubAddresses[hubCounter]
         print('Sent GET request')
         print(hubAddresses[hubCounter])
         hubCounter = hubCounter + 1;
     except Exception:
         pass
         print('failedtosend')
-    time.sleep(5)
+    #time.sleep(5)
+
+def makePOSTRequest(endpoint,body):
+    global hubCounter
+    if hubCounter >= 2:
+        hubCounter = 0
+    try:
+        s.sendto('makePOSTrequest' + ';' + endpoint + ';' + body, (everyone, myport))   #hubAddresses[hubCounter]
+        print('Sent POST request')
+        print(hubAddresses[hubCounter])
+        hubCounter = hubCounter + 1;
+    except Exception:
+        pass
+        print('failedtosend')
 
 #*************RECEIVE MESSAGE HANDLER****************
 packageList = []
+headerList = ''
 def receive_pack():
     # listen for incomming packets
     global packageList
+    global headerList
     while True:
-        rcv_data, rcv_addr = s.recvfrom(128)
+        rcv_data, rcv_addr = s.recvfrom(1000)
         if len(rcv_data) == 0:
             break
         rcv_ip = rcv_addr[0]
         rcv_port = rcv_addr[1]
         print('Incomming %d bytes from %s (port %d)'%(len(rcv_data), rcv_ip, rcv_port))
         print(rcv_data)
-        packageList.append(rcv_data)
+        headerList += rcv_data.decode('utf-8')
+
         # could send some ACK pack:
         if rcv_data.startswith("Hello"):
             try:
@@ -155,31 +189,22 @@ def long():
   global hubCounter
   fastBlinkLED()
   print("****** EMERGENCY BUTTON ******")
-  if emergencymode == 0:
-      emergencymode = 1
-      try:
-          gpsCoords = getGPS()
-          s.sendto('Emergency!' + str(gpsCoords), (everyone, myport))   #hubAddresses[hubCounter]
-          print('Sent EMERGENCY beacon')
-          print('hubct' + str(hubAddresses[hubCounter]))
-          hubCounter = hubCounter + 1;
-          for x in range(1):
-              led_GREEN.channel(0,pin='P20', duty_cycle=1)
-              time.sleep_ms(1000)
-              led_GREEN.channel(0,pin='P20', duty_cycle=0)
-              time.sleep_ms(100)
-      except Exception:
-          pass
-          print('failedtosend EMERGENCY')
-
-  else:
-      emergencymode =0
-      print('emergencymodeOFF')
+  try:
+      gpsCoords = getGPS()
+      s.sendto('Emergency!' + str(gpsCoords), (everyone, myport))   #hubAddresses[hubCounter]
+      print('Sent EMERGENCY beacon')
+      print('hubct' + str(hubAddresses[hubCounter]))
+      hubCounter = hubCounter + 1;
       for x in range(1):
-        led_RED.channel(2,pin='P19', duty_cycle=.8)
-        time.sleep_ms(1000)
-        led_RED.channel(2,pin='P19', duty_cycle=0)
-        time.sleep_ms(100)
+          led_GREEN.channel(0,pin='P10', duty_cycle=1)
+          time.sleep_ms(1000)
+          led_GREEN.channel(0,pin='P10', duty_cycle=0)
+          time.sleep_ms(100)
+  except Exception:
+      pass
+      print('failedtosend EMERGENCY')
+
+
 
 import button
 but = button.BUTTON()
@@ -209,16 +234,16 @@ def getBatteryCharge():
 
     if percentage >= 80:
           for x in range(4):
-              led_GREEN.channel(0,pin='P20', duty_cycle=1)
+              led_GREEN.channel(0,pin='P10', duty_cycle=1)
               time.sleep_ms(500)
-              led_GREEN.channel(0,pin='P20', duty_cycle=0)
+              led_GREEN.channel(0,pin='P10', duty_cycle=0)
               time.sleep_ms(100)
 
     elif percentage >= 60 and percentage <= 80:
           for x in range(3):
-              led_GREEN.channel(0,pin='P20', duty_cycle=1)
+              led_GREEN.channel(0,pin='P10', duty_cycle=1)
               time.sleep_ms(500)
-              led_GREEN.channel(0,pin='P20', duty_cycle=0)
+              led_GREEN.channel(0,pin='P10', duty_cycle=0)
               time.sleep_ms(100)
           led_RED.channel(2,pin='P19', duty_cycle=1)
           time.sleep_ms(500)
@@ -227,31 +252,31 @@ def getBatteryCharge():
 
     elif percentage >=40 and percentage <= 60:
           for x in range(2):
-              led_GREEN.channel(0,pin='P20', duty_cycle=1)
+              led_GREEN.channel(0,pin='P10', duty_cycle=1)
               time.sleep_ms(500)
-              led_GREEN.channel(0,pin='P20', duty_cycle=0)
+              led_GREEN.channel(0,pin='P10', duty_cycle=0)
               time.sleep_ms(100)
           for x in range(2):
-            led_RED.channel(2,pin='P19', duty_cycle=1)
+            led_RED.channel(2,pin='P9', duty_cycle=1)
             time.sleep_ms(500)
-            led_RED.channel(2,pin='P19', duty_cycle=0)
+            led_RED.channel(2,pin='P9', duty_cycle=0)
             time.sleep_ms(100)
     elif percentage >=20 and percentage <= 40:
           for x in range(1):
-              led_GREEN.channel(0,pin='P20', duty_cycle=1)
+              led_GREEN.channel(0,pin='P10', duty_cycle=1)
               time.sleep_ms(500)
-              led_GREEN.channel(0,pin='P20', duty_cycle=0)
+              led_GREEN.channel(0,pin='P10', duty_cycle=0)
               time.sleep_ms(100)
           for x in range(3):
-              led_RED.channel(2,pin='P19', duty_cycle=1)
+              led_RED.channel(2,pin='P9', duty_cycle=1)
               time.sleep_ms(500)
-              led_RED.channel(2,pin='P19', duty_cycle=0)
+              led_RED.channel(2,pin='P9', duty_cycle=0)
               time.sleep_ms(100)
     else:
           for x in range(4):
-              led_RED.channel(2,pin='P19', duty_cycle=1)
+              led_RED.channel(2,pin='P9', duty_cycle=1)
               time.sleep_ms(500)
-              led_RED.channel(2,pin='P19', duty_cycle=0)
+              led_RED.channel(2,pin='P9', duty_cycle=0)
               time.sleep_ms(100)
 
 
@@ -271,7 +296,7 @@ led_RED = PWM(0, frequency)
 led_GREEN = PWM(0, frequency)
 def fastBlinkLED():
     for x in range(10):
-        led_RED.channel(2,pin='P19', duty_cycle=1)
+        led_RED.channel(2,pin='P9', duty_cycle=1)
         time.sleep_ms(100)
-        led_RED.channel(2,pin='P19', duty_cycle=0)
+        led_RED.channel(2,pin='P9', duty_cycle=0)
         time.sleep_ms(100)
